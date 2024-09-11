@@ -2,6 +2,7 @@
 using ApiJWT.Dtos;
 using ApiJWT.Models;
 using ApiJWT.Services.SenhaService;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace ApiJWT.Services.AuthService
@@ -55,6 +56,42 @@ namespace ApiJWT.Services.AuthService
             return respostaServico;
         }
 
+        public async Task<ResponseModel<string>> Login(UsuarioLoginDto usuarioLogin)
+        {
+            ResponseModel<string> respostaServico = new ResponseModel<string>();
+            try
+            {
+                var usuario = await _context.Usuarios.FirstOrDefaultAsync(userBanco => userBanco.Email == usuarioLogin.Email);
+
+                if(usuario == null)
+                {
+                    respostaServico.Mensagem = "Credenciais inválidas!";
+                    respostaServico.Status = false;
+                    return respostaServico;
+                }
+
+                if (!_senhaInterface.VerificaSenhaHash(usuarioLogin.Senha, usuario.SenhaHash, usuario.SenhaSalt))
+                {
+                    respostaServico.Mensagem = "Credenciais inválidas!";
+                    respostaServico.Status = false;
+                    return respostaServico;
+                }
+                var token = _senhaInterface.CriarToken(usuario);
+
+                respostaServico.Mensagem = "Usuario logado com sucesso!";
+                respostaServico.Dados = token;
+
+            }
+            catch (Exception ex)
+            {
+                respostaServico.Dados = null;
+                respostaServico.Mensagem = ex.Message;
+                respostaServico.Status = false;
+
+            }
+            return respostaServico;
+        }
+
         public bool verificaSeEmailEUsuarioJaExiste(UsuarioCriacaoDto usuarioRegistro)
         {
             var usuario = _context.Usuarios.FirstOrDefault(userBanco => userBanco.Usuario == usuarioRegistro.Usuario || userBanco.Email == usuarioRegistro.Email);
@@ -63,10 +100,5 @@ namespace ApiJWT.Services.AuthService
 
             return false;
         }
-
-
-
-
-
     }
 }

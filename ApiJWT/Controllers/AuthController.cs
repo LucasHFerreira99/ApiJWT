@@ -16,6 +16,13 @@ namespace ApiJWT.Controllers
             _authInterface = authInterface;
         }
 
+        [HttpPost("login")]
+        public async Task<ActionResult> Register(UsuarioLoginDto usuarioLogin)
+        {
+            var resposta = await _authInterface.Login(usuarioLogin);
+            return Ok(resposta);
+        }
+
 
         [HttpPost("register")]
         public async Task<ActionResult> Register(UsuarioCriacaoDto usuarioRegister)

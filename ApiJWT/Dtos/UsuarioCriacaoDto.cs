@@ -8,7 +8,7 @@ namespace ApiJWT.Dtos
         [Required(ErrorMessage = "O campo usuário é obrigatório")]
         public string Usuario { get; set; }
 
-        [Required(ErrorMessage = "O campo usuário é obrigatório"), EmailAddress(ErrorMessage ="E-mail inválido!")]
+        [Required(ErrorMessage = "O campo E-mail é obrigatório"), EmailAddress(ErrorMessage ="E-mail inválido!")]
         public string Email { get; set; }
 
         [Required(ErrorMessage = "O campo senha é obrigatório")]
